@@ -13,8 +13,9 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
     ros::Publisher pub = nh.advertise<sensor_msgs::JointState>("joint_states", 10);
 
-    ros::Rate loop_rate(10);
+    ros::Rate loop_rate(1);
     double count = 0;
+    int i = 0;
     while(ros::ok())
     {
         sensor_msgs::JointState j;
@@ -33,7 +34,23 @@ int main(int argc, char** argv)
         j.name[10] = "left_leg_back_leg_joint1";
         j.name[11] = "left_leg_back_leg_joint2";
         j.position.resize(12);
-        double x,y,x2,y2;
+
+        std::vector<std::vector<float>> tarPos{{0.05, 0.1}, {0.05, 0.15}, {-0.05, 0.15}, {-0.05, 0.1}}; 
+        j.position[0] = 0;
+        j.position[2] = (double)std::acos((tarPos[i%4][0]*tarPos[i%4][0]+tarPos[i%4][1]*tarPos[i%4][1]-r1*r1-r2*r2)/(2*r1*r2));
+        j.position[1] = (double)std::atan2((-r2*std::sin(j.position[2])*tarPos[i%4][0] + (r1 + r2*std::cos(j.position[2]))*tarPos[i%4][1]),((r1 + r2*cos(j.position[2]))*tarPos[i%4][0] + r2*sin(j.position[2])*tarPos[i%4][1]));
+        j.position[3] = 0;
+        j.position[5] = 0;
+        j.position[4] = 0;
+        j.position[6] = 0;
+        j.position[8] = 0;
+        j.position[7] = 0;
+        j.position[9] = 0;
+        j.position[11] = 0;
+        j.position[10] = 0;
+        i++;
+
+        /*double x,y,x2,y2;
         x = 0.03*std::cos(count) + 0.1;
         y = 0.03*std::sin(count) + 0.15;
         x2 = 0.03*cos(count+3.14) + 0.1;
@@ -50,7 +67,7 @@ int main(int argc, char** argv)
         j.position[9] = 0;
         j.position[11] = (double)std::acos((x*x+y*y-r1*r1-r2*r2)/(2*r1*r2));
         j.position[10] = -(double)std::atan2((-r2*std::sin(j.position[11])*x + (r1 + r2*std::cos(j.position[11]))*y),((r1 + r2*cos(j.position[11]))*x + r2*sin(j.position[11])*y));
-        count += 0.2;
+        count += 0.2;*/
 
         pub.publish(j);
 
