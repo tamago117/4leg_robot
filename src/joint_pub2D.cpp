@@ -34,23 +34,23 @@ int main(int argc, char** argv)
         j.name[11] = "left_leg_back_leg_joint2";
         j.position.resize(12);
         double x,y,x2,y2;
-        x = 0.01*std::cos(count) ;
-        y = 0.01*std::sin(count) + 0.2;
-        x2 = 0.03*cos(count+3.14) - 0.15;
-        y2 = 0.03*sin(count+3.14) + 0.15;
+        x = 0.03*std::cos(count) + 0.1;
+        y = 0.03*std::sin(count) + 0.15;
+        x2 = 0.03*cos(count+3.14) + 0.1;
+        y2 = 0.03*sin(count+3.14) + 0.16;
         j.position[0] = 0;
-        j.position[2] = (double)acos((x*x+y*y-r1*r1-r2*r2)/(2*r1*r2));
-        j.position[1] = (double)asin(x/sqrt(sin(j.position[2])*sin(j.position[2])+(r1+r2*cos(j.position[2])*(r1+r2*cos(j.position[2]))))) - atan((-r1-r2*cos(j.position[2]))/sin(j.position[2]));
+        j.position[2] = (double)std::acos((x*x+y*y-r1*r1-r2*r2)/(2*r1*r2));
+        j.position[1] = (double)std::atan2((-r2*std::sin(j.position[2])*x + (r1 + r2*std::cos(j.position[2]))*y),((r1 + r2*cos(j.position[2]))*x + r2*sin(j.position[2])*y));
         j.position[3] = 0;
-        j.position[4] = (float)acos((x2*x2 + y2*y2 + r1*r1 - r2*r2)/(2*r1*sqrt(x2*x2 + y2*y2))) + atan(y2/x2);
-        j.position[5] = -((float)atan((y2 - r1*sin(j.position[4]))/(x2 - r1*cos(j.position[4]))) - j.position[4]);
+        j.position[5] = (double)std::acos((x2*x2+y2*y2-r1*r1-r2*r2)/(2*r1*r2));
+        j.position[4] = (double)std::atan2((-r2*std::sin(j.position[5])*x2 + (r1 + r2*std::cos(j.position[5]))*y2),((r1 + r2*cos(j.position[5]))*x2 + r2*sin(j.position[5])*y2));
         j.position[6] = 0;
-        j.position[7] = -((float)acos((x2*x2 + y2*y2 + r1*r1 - r2*r2)/(2*r1*sqrt(x2*x2 + y2*y2))) + atan(y2/x2));
-        j.position[8] = (float)atan((y2 - r1*sin(j.position[7]))/(x2 - r1*cos(j.position[7]))) - j.position[7];
+        j.position[8] = (double)std::acos((x2*x2+y2*y2-r1*r1-r2*r2)/(2*r1*r2));
+        j.position[7] = -(double)std::atan2((-r2*std::sin(j.position[8])*x2 + (r1 + r2*std::cos(j.position[8]))*y2),((r1 + r2*cos(j.position[8]))*x2 + r2*sin(j.position[8])*y2));
         j.position[9] = 0;
-        j.position[10] = (double)(std::acos((x*x + y*y + r1*r1 - r2*r2)/(2*r1*std::sqrt(x*x + y*y))) + std::atan(y/x));
-        j.position[11] = (double)(std::atan((y - r1*std::sin(j.position[10]))/(x - r1*std::cos(j.position[10]))) - j.position[10]);
-        count += 0.1;
+        j.position[11] = (double)std::acos((x*x+y*y-r1*r1-r2*r2)/(2*r1*r2));
+        j.position[10] = -(double)std::atan2((-r2*std::sin(j.position[11])*x + (r1 + r2*std::cos(j.position[11]))*y),((r1 + r2*cos(j.position[11]))*x + r2*sin(j.position[11])*y));
+        count += 0.2;
 
         pub.publish(j);
 
