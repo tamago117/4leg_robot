@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<robot name="right_leg" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:macro name="right_leg_macro" params="parent prefix xyz rpy inv">
+        <joint name="${prefix}_joint" type="continuous">
+            <origin xyz="${xyz}" rpy="${rpy}"/>
+            <parent link="${parent}"/>
+            <child link="${prefix}_servohead5"/>
+            <axis xyz="1 0 0"/>
+        </joint>
+        <link name="${prefix}_servohead5">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://4leg_robot/stl/servohead_parts5.stl"/>
+                </geometry>
+                <material name="gray"/>                        
+            </visual>
+        </link>
+
+        <joint name="${prefix}_servohead_joint" type="fixed">
+            <parent link="${prefix}_servohead5"/>
+            <child link="${prefix}_servohead6"/>
+            <origin xyz="0.0 0.015 0.0"/>
+        </joint>
+        <link name="${prefix}_servohead6">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                        <mesh filename="package://4leg_robot/stl/servohead_parts6.stl"/>
+                </geometry>
+                <material name="gray"/>
+            </visual>
+        </link>
+
+        <joint name="${prefix}_leg_joint1" type="continuous">
+            <parent link="${prefix}_servohead5"/>
+            <child link="${prefix}_leg1"/>
+            <xacro:if value="${inv=='false'}">
+                <origin xyz="0.0 -0.016 0.0" rpy="0.0 0.0 0.0"/>
+            </xacro:if>
+            <xacro:if value="${inv=='true'}">
+                <origin xyz="0.0 -0.016 0.0" rpy="0.0 ${radians(180)} 0.0"/>
+            </xacro:if>
+            <axis xyz="0 1 0"/>
+        </joint>
+        <link name="${prefix}_leg1">
+            <visual>
+                <geometry>
+                        <mesh filename="package://4leg_robot/stl/leg_parts1.stl"/>
+                </geometry>
+                <material name="gray"/>
+            </visual>
+        </link>
+
+        <joint name="${prefix}_leg_joint2" type="continuous">
+            <parent link="${prefix}_leg1"/>
+            <child link="${prefix}_leg2"/>
+            <xacro:if value="${inv=='false'}">
+                <origin xyz="0.13 -0.019 0.0" rpy="0.0 0.0 0.0"/>
+            </xacro:if>
+            <xacro:if value="${inv=='true'}">
+                <origin xyz="0.13 -0.019 0.0" rpy="0.0 ${radians(180)} ${radians(180)}"/>
+            </xacro:if>
+            <axis xyz="0 1 0"/>
+        </joint>
+        <link name="${prefix}_leg2">
+            <visual>
+                <geometry>
+                    <xacro:if value="${inv=='false'}">
+                        <mesh filename="package://4leg_robot/stl/leg_parts2.stl"/>
+                    </xacro:if>
+                    <xacro:if value="${inv=='true'}">
+                        <mesh filename="package://4leg_robot/stl/leg_parts3.stl"/>
+                    </xacro:if>
+                </geometry>
+                <material name="gray"/>
+            </visual>
+        </link>
+
+        <joint name="${prefix}_leg_position" type="fixed">
+            <parent link="${prefix}_leg2"/>
+            <child link="${prefix}_toe"/>
+            <origin xyz="0.127 -0.005 0.0" rpy="0.0 0.0 0.0"/>
+        </joint>
+        <link name="${prefix}_toe">
+            <visual>
+                <geometry>
+                    <sphere radius="0.001"/>
+                </geometry>
+                <material name="gray"/>
+            </visual>
+        </link>
+    </xacro:macro>
+
+    <xacro:macro name="left_leg_macro" params="parent prefix xyz rpy inv">
+        <joint name="${prefix}_joint" type="continuous">
+            <origin xyz="${xyz}" rpy="${rpy}"/>
+            <parent link="${parent}"/>
+            <child link="${prefix}_servohead7"/>
+            <axis xyz="1 0 0"/>
+        </joint>
+        <link name="${prefix}_servohead7">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://4leg_robot/stl/servohead_parts7.stl"/>
+                </geometry>
+                <material name="gray"/>                        
+            </visual>
+        </link>
+
+        <joint name="${prefix}_servohead_joint" type="fixed">
+            <parent link="${prefix}_servohead7"/>
+            <child link="${prefix}_servohead6"/>
+            <origin xyz="0.0 0.015 0.0"/>
+        </joint>
+        <link name="${prefix}_servohead6">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                        <mesh filename="package://4leg_robot/stl/servohead_parts6.stl"/>
+                </geometry>
+                <material name="gray"/>
+            </visual>
+        </link>
+
+        <joint name="${prefix}_leg_joint1" type="continuous">
+            <parent link="${prefix}_servohead7"/>
+            <child link="${prefix}_leg1"/>
+            <xacro:if value="${inv=='false'}">
+                <origin xyz="0.0 -0.016 0.0" rpy="0.0 0.0 0.0"/>
+            </xacro:if>
+            <xacro:if value="${inv=='true'}">
+                <origin xyz="0.0 -0.016 0.0" rpy="0.0 ${radians(180)} 0.0"/>
+            </xacro:if>
+            <axis xyz="0 1 0"/>
+        </joint>
+        <link name="${prefix}_leg1">
+            <visual>
+                <geometry>
+                        <mesh filename="package://4leg_robot/stl/leg_parts1.stl"/>
+                </geometry>
+                <material name="gray"/>
+            </visual>
+        </link>
+
+        <joint name="${prefix}_leg_joint2" type="continuous">
+            <parent link="${prefix}_leg1"/>
+            <child link="${prefix}_leg2"/>
+            <xacro:if value="${inv=='false'}">
+                <origin xyz="0.13 -0.019 0.0" rpy="0.0 0.0 0.0"/>
+            </xacro:if>
+            <xacro:if value="${inv=='true'}">
+                <origin xyz="0.13 -0.019 0.0" rpy="0.0 ${radians(180)} ${radians(180)}"/>
+            </xacro:if>
+            
+            <axis xyz="0 1 0"/>
+        </joint>
+        <link name="${prefix}_leg2">
+            <visual>
+                <geometry>
+                    <xacro:if value="${inv=='false'}">
+                        <mesh filename="package://4leg_robot/stl/leg_parts2.stl"/>
+                    </xacro:if>
+                    <xacro:if value="${inv=='true'}">
+                        <mesh filename="package://4leg_robot/stl/leg_parts3.stl"/>
+                    </xacro:if>
+                </geometry>
+                <material name="gray"/>
+            </visual>
+        </link>
+
+        <joint name="${prefix}_leg_position" type="fixed">
+            <parent link="${prefix}_leg2"/>
+            <child link="${prefix}_toe"/>
+            <origin xyz="0.127 -0.005 0.0" rpy="0.0 0.0 0.0"/>
+        </joint>
+        <link name="${prefix}_toe">
+            <visual>
+                <geometry>
+                    <sphere radius="0.001"/>
+                </geometry>
+                <material name="gray"/>
+            </visual>
+        </link>
+    </xacro:macro>
+
+</robot>

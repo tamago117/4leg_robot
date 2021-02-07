@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<robot name="4leg_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+    <material name="gray">
+        <color rgba="0.5 0.5 0.5 2.5"/> 
+    </material>
+
+    <xacro:include filename="$(find 4leg_robot)/xacro/leg.xacro" />
+    
+    <link name="base_link"/>
+
+    <joint name="robot_base" type="fixed">
+        <parent link="base_link"/>
+        <child link="robot_body"/>
+        <origin xyz="0.0 0.0 0.0101" rpy="0.0 0.0 0.0"/>
+    </joint>
+    <link name="robot_body">
+        <visual>
+            <geometry>
+                    <mesh filename="package://4leg_robot/stl/Servo_4leg_body.stl"/>
+            </geometry>
+            <material name="gray"/>
+        </visual>
+    </link>
+
+    <xacro:right_leg_macro prefix="right_leg_front" parent="base_link" xyz="-0.141 -0.0572 0.0" rpy="0 0 0" inv="false"/>
+    <xacro:left_leg_macro prefix="right_leg_back" parent="base_link" xyz="0.141 -0.0572 0.0" rpy="0 0 0" inv="false"/>
+    <xacro:left_leg_macro prefix="left_leg_front" parent="base_link" xyz="-0.141 0.0572 0.0" rpy="0 0 ${radians(-180)}" inv="true"/>
+    <xacro:right_leg_macro prefix="left_leg_back" parent="base_link" xyz="0.141 0.0572 0.0" rpy="0 0 ${radians(-180)}" inv="true"/>
+
+</robot>

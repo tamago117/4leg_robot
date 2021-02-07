@@ -1,0 +1,15 @@
+<launch>
+  <arg name="model" default="$(find 4leg_robot)/xacro/4leg_robot.xacro" />
+  <arg name="rvizconfig" default="$(find 4leg_robot)/rviz/4leg_robot.rviz" />
+  <arg name="joy" default="true" />
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model) --inorder" />
+  
+  <group if="$(arg joy)">
+    <node name="joy_node"   pkg="joy" type="joy_node" />
+    <node name="basic_PS4twist_publisher" pkg="sim_lecture" type="basic_PS4twist_publisher"/>
+  </group>
+  <node name="joint_pub2D" pkg="4leg_robot" type="joint_pub2D"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+  <!--<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />-->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+</launch>
