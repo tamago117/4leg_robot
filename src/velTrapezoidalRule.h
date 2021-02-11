@@ -1,10 +1,13 @@
 #pragma once
 
+#include <iostream>
 #include <chrono>
+#include <vector>
 
 class velTrapezoidalRule
 {
 private:
+    //accelTimeRate range:0-0.5
     double accelTimeRate;
     double moveT;
     double accelT;
@@ -13,10 +16,12 @@ private:
     double decT;
     double nowT;
     double angle;
+    bool runningState;
     std::chrono::system_clock::time_point start,preT,end;
 public:
     velTrapezoidalRule(double accelTimeRate_, double moveT_);
-    int update(double& angle, double tarAngle, double startAngle);
+    void update(double& angle, double tarAngle, double startAngle);
+    bool getRunningState();
 };
 
 velTrapezoidalRule::velTrapezoidalRule(double accelTimeRate_, double moveT_)
@@ -28,7 +33,7 @@ velTrapezoidalRule::velTrapezoidalRule(double accelTimeRate_, double moveT_)
     preT = std::chrono::system_clock::now();
 }
 
-int velTrapezoidalRule::update(double& angle, double tarAngle, double startAngle)
+void velTrapezoidalRule::update(double& angle, double tarAngle, double startAngle)
 {
     end = std::chrono::system_clock::now();
     nowT = std::chrono::duration_cast<std::chrono::milliseconds>(end-preT).count();
@@ -56,9 +61,16 @@ int velTrapezoidalRule::update(double& angle, double tarAngle, double startAngle
     //goal point process
     end = std::chrono::system_clock::now();
     double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-preT).count();
-    if(elapsed >= moveT*1000){
+    if(elapsed > moveT*1000){
         preT = std::chrono::system_clock::now();
-        return 0;
+        runningState = false;
+
+    }else{
+        runningState = true;
     }
-    return 1;
+}
+
+bool velTrapezoidalRule::getRunningState()
+{
+    return runningState;
 }

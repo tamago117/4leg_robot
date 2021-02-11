@@ -4,7 +4,7 @@
 #include <math.h>
 #include <chrono>
 #include <iostream>
-//#include "velTrapezoidalRule.h"
+#include "velTrapezoidalRule.h"
 
 const double r0 = 0.035;
 const double r1 = 0.13;
@@ -13,14 +13,14 @@ const int dofNum = 12;
 
 //accelTimeRate range:0-0.5
 const double accelTimeRate = 0.5;
-const double moveT = 1;
-const double accelT = accelTimeRate * moveT;
+const double moveTime = 0.2;
 
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "joint_pub2D");
     ros::NodeHandle nh;
     ros::Publisher pub = nh.advertise<sensor_msgs::JointState>("joint_states", 10);
+    velTrapezoidalRule tra[3] = {velTrapezoidalRule(accelTimeRate, moveTime), velTrapezoidalRule(accelTimeRate, moveTime), velTrapezoidalRule(accelTimeRate, moveTime)};
 
     ros::Rate loop_rate(100);
     double count = 0;
@@ -31,19 +31,11 @@ int main(int argc, char** argv)
     std::vector<double> angularAcc(dofNum);
     std::vector<double> decT(dofNum);
     std::vector<double> tarAngle(dofNum);
-    std::vector<std::vector<float>> tarPos{{0.08, 0.08}, {0.08, 0.2},{0, 0.2}, {-0.08, 0.2}, {-0.08, 0.08}, {0,0.08}};
+    std::vector<std::vector<float>> tarPos{{0.02, 0.08}, {0.08, 0.2},{0, 0.2}, {-0.08, 0.2}, {-0.02, 0.08}, {0,0.08}};
     std::vector<float> startAngle{0,0,0};
 
-    std::chrono::system_clock::time_point start,preT,end;
-    start = std::chrono::system_clock::now();
-    preT = std::chrono::system_clock::now();
     while(ros::ok())
     {
-        end = std::chrono::system_clock::now();
-        double nowT = std::chrono::duration_cast<std::chrono::milliseconds>(end-preT).count();
-        nowT /= 1000;
-        std::cout << nowT <<std::endl;
-
         sensor_msgs::JointState j;
         j.header.stamp = ros::Time::now();
         j.name.resize(dofNum);
@@ -74,29 +66,17 @@ int main(int argc, char** argv)
         tarAngle[11] = 0;
         tarAngle[10] = 0;
 
-        for(int k=1; k<3; k++)
+        for(int l=0; l<3; l++)
         {
-            diffAngle[k] = tarAngle[k] - startAngle[k];
-            omegaMax[k] = diffAngle[k] / (moveT*(1.0-accelTimeRate));
-            //angularAcc[i] = omegaMax[i] / accelT;
+            tra[l].update(j.position[l], tarAngle[l], startAngle[l]);
+        }
 
-            if(nowT < accelT){
-                //加速
-                j.position[k] = startAngle[k] + omegaMax[k] * nowT * nowT / (2.0*accelT);
-                //j.position[1] = startAngle[1] + omegaMax[1] * nowT * nowT / (2.0*accelT)-1.57;
-
-            }else if(accelT <= nowT && nowT <= (moveT - accelT)){
-                //定速 
-                
-                j.position[k] = startAngle[k] + (omegaMax[k]*accelT/2.0) + omegaMax[k]*(nowT-accelT);
-                //j.position[1] = startAngle[1] + (omegaMax[1]*accelT/2.0) + omegaMax[1]*(nowT-accelT)-1.57;
-            
-            }else{
-                decT[k] = (nowT-(moveT-accelT));
-                j.position[k] = startAngle[k] + (omegaMax[k]*accelT/2.0) + omegaMax[k]*(moveT-2*accelT) + (2*omegaMax[k]-omegaMax[k]*decT[k]/accelT)*decT[k]/2;
-                //j.position[1] = startAngle[1] + (omegaMax[1]*accelT/2.0) + omegaMax[1]*(moveT-2*accelT) + (2*omegaMax[1]-omegaMax[1]*decT[1]/accelT)*decT[1]/2 -1.57;
-            
+        if(!tra[0].getRunningState()){
+            for(int k=0;k<3; k++){
+                startAngle[k] = tarAngle[k];
             }
+            i++;
+            continue;
         }
 
         
@@ -110,16 +90,8 @@ int main(int argc, char** argv)
         j.position[11] = 0;
         j.position[10] = 0;
 
-        end = std::chrono::system_clock::now();
-        double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-preT).count();
-        if(elapsed >= moveT*1000){
-            for(int k=1;k<3; k++){
-                startAngle[k] = tarAngle[k];
-            }
-            i++;
-            preT = std::chrono::system_clock::now();
-        }
-
+        
+        
         /*double x,y,x2,y2;
         x = 0.03*std::cos(count) + 0.1;
         y = 0.03*std::sin(count) + 0.15;
