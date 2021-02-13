@@ -64,10 +64,10 @@ void velTrapezoidalRule::update(double& angle, double tarAngle, double startAngl
     if(elapsed > moveT*1000){
         preT = std::chrono::system_clock::now();
         runningState = false;
-
-    }else{
-        runningState = true;
+        return;
     }
+        runningState = true;
+    
 }
 
 bool velTrapezoidalRule::getRunningState()
