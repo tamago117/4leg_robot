@@ -41,9 +41,9 @@ Vector::Vector(double init_x, double init_y) : x(init_x),y(init_y)
 
 }
 
-Vector::Vector(double init_x, double init_y, double init_z) : x(init_y),y(init_y),z(init_z)
+Vector::Vector(double init_x, double init_y, double init_z) : x(init_x),y(init_y),z(init_z)
 {
-
+    
 }
 
 double Vector::absVal(){

@@ -5,12 +5,18 @@
 #include <chrono>
 #include <iostream>
 #include "velTrapezoidalRule.h"
-#include "kinematics2Dof.h"
+#include "kinematics3Dof.h"
 
-const std::vector<double> r{0.13, 0.127};
-const std::vector<std::vector<double>> tarPos{{0.08, 0.08}, {0.08, 0.2},{0, 0.2}, {-0.08, 0.2}, {-0.08, 0.08}, {0,0.08}};
+
+const std::vector<double> r{0.035, 0.13, 0.127};
 const int dofNum = 12;
-const std::vector<std::vector<double>> angRange{{-3.14,3.14},{-3.14,3.14}};
+const std::vector<std::vector<double>> angRange{{-3.14,3.14},{-3.14,3.14},{-3.14,3.14}};
+//const std::vector<std::vector<double>> tarPos{{0.1, 0, 0.1}, {0.1, -0.02, 0.18}, {0.1, 0.02, 0.16}, {0.05, 0, 0.18}};
+const std::vector<std::vector<double>> tarPos{{0.1, 0, 0}, {0.15, 0, 0}};
+//const std::vector<std::vector<double>> tarPos{{0, 0, 0.1}, {0, 0, 0.15}};
+//const std::vector<std::vector<double>> tarPos{{0, 0.1, 0}, {0, 0.15, 0}};
+//const std::vector<std::vector<double>> tarPos{{0, 0.1, 0.1}};
+
 
 //accelTimeRate range:0-0.5
 const double accelTimeRate = 0.5;
@@ -18,12 +24,11 @@ const double moveTime = 1;
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "joint_pub2D");
+    ros::init(argc, argv, "joint_pub3D");
     ros::NodeHandle nh;
     ros::Publisher pub = nh.advertise<sensor_msgs::JointState>("joint_states", 10);
     velTrapezoidalRule tra[3] = {velTrapezoidalRule(accelTimeRate, moveTime), velTrapezoidalRule(accelTimeRate, moveTime), velTrapezoidalRule(accelTimeRate, moveTime)};
-    //kinematics2Dof kin2d(r1, r2, angRange);
-    kinematics2Dof kin2d(r, angRange);
+    kinematics3Dof kin3d(r, angRange);
 
     ros::Rate loop_rate(100);
     int count = 0;
@@ -32,10 +37,10 @@ int main(int argc, char** argv)
     std::vector<double> angularAcc(dofNum);
     std::vector<double> decT(dofNum);
     std::vector<double> tarAngle(dofNum);
-    //std::vector<std::vector<double>> tarPos{{0.08, 0.08,-0.08,-0.08}, {0.08, 0.2,0.2,0.08}};
     std::vector<float> startAngle{0,0,0};
-    std::vector<double> angle{0,0};
+    std::vector<double> angle{0, 0, 0};
 
+    double cou=0;
     while(ros::ok())
     {
         sensor_msgs::JointState j;
@@ -55,11 +60,15 @@ int main(int argc, char** argv)
         j.name[11] = "left_leg_back_leg_joint2";
         j.position.resize(dofNum);
 
-        kin2d.invKinematics2Dof(angle, tarPos[count%tarPos.size()]);
+        //std::vector<std::vector<double>> tarPos{{0.02*cos(cou), 0.02*sin(cou)+0.04, 0.1}};
+        kin3d.invKinematics3Dof(angle, tarPos[count%tarPos.size()]);
 
-        tarAngle[0] = 0;
-        tarAngle[1] = angle[0];
-        tarAngle[2] = angle[1];
+        /*j.position[0] = angle[0];
+        j.position[1] = angle[1];
+        j.position[2] = angle[2];*/
+        tarAngle[0] = angle[0];
+        tarAngle[1] = angle[1];
+        tarAngle[2] = angle[2];
         tarAngle[3] = 0;
         tarAngle[5] = 0;
         tarAngle[4] = 0;
@@ -70,7 +79,7 @@ int main(int argc, char** argv)
         tarAngle[11] = 0;
         tarAngle[10] = 0;
 
-        for(int i=0; i<3; i++)
+        for(int i=0; i<3; ++i)
         {
             tra[i].update(j.position[i], tarAngle[i], startAngle[i]);
         }
@@ -94,26 +103,7 @@ int main(int argc, char** argv)
         j.position[11] = 0;
         j.position[10] = 0;
 
-        
-        
-        /*double x,y,x2,y2;
-        x = 0.03*std::cos(count) + 0.1;
-        y = 0.03*std::sin(count) + 0.15;
-        x2 = 0.03*cos(count+3.14) + 0.1;
-        y2 = 0.03*sin(count+3.14) + 0.16;
-        j.position[0] = 0;
-        j.position[2] = (double)std::acos((x*x+y*y-r1*r1-r2*r2)/(2*r1*r2));
-        j.position[1] = (double)std::atan2((-r2*std::sin(j.position[2])*x + (r1 + r2*std::cos(j.position[2]))*y),((r1 + r2*cos(j.position[2]))*x + r2*sin(j.position[2])*y));
-        j.position[3] = 0;
-        j.position[5] = (double)std::acos((x2*x2+y2*y2-r1*r1-r2*r2)/(2*r1*r2));
-        j.position[4] = (double)std::atan2((-r2*std::sin(j.position[5])*x2 + (r1 + r2*std::cos(j.position[5]))*y2),((r1 + r2*cos(j.position[5]))*x2 + r2*sin(j.position[5])*y2));
-        j.position[6] = 0;
-        j.position[8] = (double)std::acos((x2*x2+y2*y2-r1*r1-r2*r2)/(2*r1*r2));
-        j.position[7] = -(double)std::atan2((-r2*std::sin(j.position[8])*x2 + (r1 + r2*std::cos(j.position[8]))*y2),((r1 + r2*cos(j.position[8]))*x2 + r2*sin(j.position[8])*y2));
-        j.position[9] = 0;
-        j.position[11] = (double)std::acos((x*x+y*y-r1*r1-r2*r2)/(2*r1*r2));
-        j.position[10] = -(double)std::atan2((-r2*std::sin(j.position[11])*x + (r1 + r2*std::cos(j.position[11]))*y),((r1 + r2*cos(j.position[11]))*x + r2*sin(j.position[11])*y));
-        count += 0.2;*/
+        cou +=0.05;
 
         pub.publish(j);
 
