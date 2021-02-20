@@ -79,8 +79,8 @@ void kinematics3Dof::invKinematics3Dof(std::vector<double>& angle, const std::ve
     angle[1] = atan2(-p.x, sqrt(sqrt_component)) - atan2(r2 * s3,r1 + r2 * c3);
 
     angle[0] = angle[0];
-    angle[1] = angle[1];
-    angle[2] = angle[2];
+    angle[1] = -angle[1] + M_PI/2;
+    angle[2] = -angle[2];
 
     //check range of angle
     for(int i=0; i<angle.size(); i++){

@@ -10,11 +10,13 @@
 
 const std::vector<double> r{0.035, 0.13, 0.127};
 const int dofNum = 12;
+const double offset_y = -0.04;
+const double offset_z = -0.07;
 const std::vector<std::vector<double>> angRange{{-3.14,3.14},{-3.14,3.14},{-3.14,3.14}};
-//const std::vector<std::vector<double>> tarPos{{0.1, 0, 0.1}, {0.1, -0.02, 0.18}, {0.1, 0.02, 0.16}, {0.05, 0, 0.18}};
-const std::vector<std::vector<double>> tarPos{{0.1, 0, 0}, {0.15, 0, 0}};
-//const std::vector<std::vector<double>> tarPos{{0, 0, 0.1}, {0, 0, 0.15}};
-//const std::vector<std::vector<double>> tarPos{{0, 0.1, 0}, {0, 0.15, 0}};
+//const std::vector<std::vector<double>> tarPos{{0.01, offset_y+0.03, offset_z-0.1}, {0.01, offset_y-0.03, offset_z-0.15}, {0.01, offset_y, offset_z-0.125}, {0.01, offset_y-0.03, offset_z-0.09}, {0.01, offset_y+0.03, offset_z-0.16}, {0.01, offset_y, offset_z-0.125}};
+//const std::vector<std::vector<double>> tarPos{{-0.1, -0.04, -0.1}, {-0.15, -0.04, -0.15}};
+//const std::vector<std::vector<double>> tarPos{{0, -0.1, -0.1}, {0, -0.15, -0.15}};
+//const std::vector<std::vector<double>> tarPos{{-0.1, 0.1, -0.07}, {-0.15, 0.15, -0.07}};
 //const std::vector<std::vector<double>> tarPos{{0, 0.1, 0.1}};
 
 
@@ -60,13 +62,13 @@ int main(int argc, char** argv)
         j.name[11] = "left_leg_back_leg_joint2";
         j.position.resize(dofNum);
 
-        //std::vector<std::vector<double>> tarPos{{0.02*cos(cou), 0.02*sin(cou)+0.04, 0.1}};
+        std::vector<std::vector<double>> tarPos{{0.02*cos(cou), offset_y+0.02*sin(cou), offset_z-0.1}};
         kin3d.invKinematics3Dof(angle, tarPos[count%tarPos.size()]);
 
-        /*j.position[0] = angle[0];
+        j.position[0] = angle[0];
         j.position[1] = angle[1];
-        j.position[2] = angle[2];*/
-        tarAngle[0] = angle[0];
+        j.position[2] = angle[2];
+        /*tarAngle[0] = angle[0];
         tarAngle[1] = angle[1];
         tarAngle[2] = angle[2];
         tarAngle[3] = 0;
@@ -90,7 +92,7 @@ int main(int argc, char** argv)
             }
             count++;
             continue;
-        }
+        }*/
 
         
         j.position[3] = 0;
